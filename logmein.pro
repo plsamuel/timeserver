@@ -7,7 +7,9 @@ CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
-    server.cpp \
+    timeserver.cpp \
+    tcptimeserver.cpp \
+    udptimeserver.cpp \
     datetimeparseexception.cpp
 
 # Default rules for deployment.
@@ -16,6 +18,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    server.hpp \
+    timeserver.hpp \
+    tcptimeserver.hpp \
+    udptimeserver.hpp \
     datetimeparseexception.hpp \
     datetimemode.hpp

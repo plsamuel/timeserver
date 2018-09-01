@@ -1,4 +1,5 @@
-#include "server.hpp"
+#include "tcptimeserver.hpp"
+#include "udptimeserver.hpp"
 
 #include <QCoreApplication>
 
@@ -22,7 +23,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    Server server(port);
+    TcpTimeServer tcpTimeServer(port);
+    UdpTimeServer udpTimeServer(port);
 
     return app.exec();
 }
