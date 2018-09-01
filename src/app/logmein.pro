@@ -3,6 +3,8 @@ QT += network
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
+CONFIG += static
+LIBS+= -dead_strip
 
 DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
