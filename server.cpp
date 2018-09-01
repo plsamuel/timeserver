@@ -18,6 +18,7 @@ Server::Server(int inPort)
 
         networkSession->open();
     } else {
+        qWarning("meuh");
         sessionOpened();
     }
 
@@ -38,21 +39,6 @@ void Server::sessionOpened()
     }
 
     connect(udpSocket, &QUdpSocket::readyRead, this, &Server::receiveInboundUDPData);
-
-//    QString ipAddress;
-//    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
-//    // use the first non-localhost IPv4 address
-//    for (int i = 0; i < ipAddressesList.size(); ++i) {
-//        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
-//            ipAddressesList.at(i).toIPv4Address()) {
-//            ipAddress = ipAddressesList.at(i).toString();
-//            break;
-//        }
-//    }
-//    // if we did not find one, use IPv4 localhost
-//    if (ipAddress.isEmpty())
-//        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
-
 
     qInfo() << QString("Started server on port %1").arg(port);
 
@@ -90,20 +76,16 @@ void Server::receiveInboundTCPConnection()
 
 void Server::receiveInboundUDPData()
 {
-    QHostAddress clientAddress;
-    quint16 clientPort;
     QByteArray datagram;
 
     while (udpSocket->hasPendingDatagrams()) {
         datagram.resize(int(udpSocket->pendingDatagramSize()));
-        udpSocket->readDatagram(datagram.data(), datagram.size(), &clientAddress, &clientPort);
-        QString msg = QString::fromLatin1(datagram.constData()).trimmed();
+        QNetworkDatagram receivedData = udpSocket->receiveDatagram();
+        QString msg = QString::fromLatin1(receivedData.data().constData()).trimmed();
         try {
             DateTimeMode mode = DateTimeModeParser::parseDateTime(msg);
 
-            QUdpSocket responseSocket(this);
-            responseSocket.writeDatagram(buildResponse(mode), clientAddress, clientPort);
-            qWarning(QString("%1 %2").arg(clientAddress.toString()).arg(clientPort).toLocal8Bit());
+            udpSocket->writeDatagram(receivedData.makeReply(buildResponse(mode)));
 
         } catch (DateTimeParseException e) {
             qWarning(e.what());
